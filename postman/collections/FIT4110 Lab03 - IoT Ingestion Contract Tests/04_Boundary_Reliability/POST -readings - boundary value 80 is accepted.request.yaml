@@ -1,0 +1,29 @@
+$kind: http-request
+name: POST /readings - boundary value 80 is accepted
+url: "{{baseUrl}}/readings"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+body:
+  type: json
+  content: |-
+    {
+      "device_id": "ESP32-LAB-A01",
+      "metric": "temperature",
+      "value": 80,
+      "unit": "celsius",
+      "timestamp": "2026-05-13T08:30:00+07:00"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Boundary value at max returns success', function () {
+        pm.expect(pm.response.code).to.eql(201);
+      });
+      pm.test('Response confirms accepted reading', function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('accepted', true);
+      });
+    language: text/javascript
+order: 1000

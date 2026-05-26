@@ -1,0 +1,33 @@
+$kind: http-request
+name: POST /readings - local response time threshold
+description: Latency/SLA chỉ có ý nghĩa khi chạy service thật.
+url: "{{baseUrl}}/readings"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+body:
+  type: json
+  content: |-
+    {
+      "device_id": "ESP32-LAB-A02",
+      "metric": "humidity",
+      "value": 55.2,
+      "unit": "percent",
+      "timestamp": "2026-05-13T08:31:00+07:00"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const env = pm.environment.get('env') || 'mock';
+      if (env === 'local') {
+        pm.test('Local service responds under 1000ms', function () {
+          pm.expect(pm.response.responseTime).to.be.below(1000);
+        });
+      } else {
+        pm.test('Skipped on mock: mock latency is not evidence of real service reliability', function () {
+          pm.expect(true).to.eql(true);
+        });
+      }
+    language: text/javascript
+order: 1000

@@ -1,0 +1,30 @@
+$kind: http-request
+name: POST /readings - happy path creates reading
+url: "{{baseUrl}}/readings"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+body:
+  type: json
+  content: |-
+    {
+      "device_id": "ESP32-LAB-A01",
+      "metric": "temperature",
+      "value": 31.5,
+      "unit": "celsius",
+      "timestamp": "2026-05-13T08:30:00+07:00"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 201', function () { pm.response.to.have.status(201); });
+      pm.test('Response has created reading fields', function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('reading_id');
+        pm.expect(json).to.have.property('device_id');
+        pm.expect(json).to.have.property('metric', 'temperature');
+        pm.expect(json).to.have.property('accepted', true);
+      });
+    language: text/javascript
+order: 1000

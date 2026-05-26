@@ -1,0 +1,30 @@
+$kind: http-request
+name: Consumer smoke - Camera/Core can call AI Vision mock
+description: "Consumer-side smoke test: gọi mock của service phụ thuộc, không gọi lại API của chính mình."
+url: "{{aiVisionMockUrl}}/detect"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{authToken}}
+body:
+  type: json
+  content: |-
+    {
+      "camera_id": "CAM01",
+      "image_url": "https://example.com/frame.jpg"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Consumer receives success from provider mock', function () {
+        pm.expect(pm.response.code).to.eql(200);
+      });
+      pm.test('Consumer can read detection fields', function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('detection_id');
+        pm.expect(json).to.have.property('label');
+        pm.expect(json).to.have.property('confidence');
+        pm.expect(json.confidence).to.be.within(0, 1);
+      });
+    language: text/javascript
+order: 1000

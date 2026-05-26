@@ -1,0 +1,15 @@
+$kind: http-request
+name: GET /health - service is alive
+url: "{{baseUrl}}/health"
+method: GET
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status code is 200', function () { pm.response.to.have.status(200); });
+      pm.test('Response has service status', function () {
+        const json = pm.response.json();
+        pm.expect(json).to.have.property('status', 'ok');
+        pm.expect(json).to.have.property('service');
+      });
+    language: text/javascript
+order: 1000

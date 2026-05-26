@@ -1,0 +1,15 @@
+# Use this workspace to collaborate
+workspace:
+  id: f4f93e7f-8a99-4e0e-8584-79f5b7b87ea0
+
+localResources:
+  specs:
+    - ..\contracts\access-gate.openapi.yaml
+    - ..\contracts\ai-vision.openapi.yaml
+    - ..\contracts\iot-ingestion.openapi.yaml
+  docs:
+    - ..\templates\consumer-provider-handshake.md
+    - ..\docs\GITHUB_ACTIONS_GUIDE.md
+    - ..\docs\TEAM_TASKS.md
+ESTING.md
+.md

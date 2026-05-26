@@ -1,0 +1,33 @@
+$kind: http-request
+name: POST /readings - invalid token is rejected on real service
+description: "Auth test thật: service local phải tự từ chối token sai."
+url: "{{baseUrl}}/readings"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer invalid-token
+body:
+  type: json
+  content: |-
+    {
+      "device_id": "ESP32-LAB-A01",
+      "metric": "temperature",
+      "value": 31.5,
+      "unit": "celsius",
+      "timestamp": "2026-05-13T08:30:00+07:00"
+    }
+scripts:
+  - type: afterResponse
+    code: |-
+      const env = pm.environment.get('env') || 'mock';
+      if (env === 'mock') {
+        pm.test('Skipped on mock: invalid token requires real auth middleware', function () {
+          pm.expect(true).to.eql(true);
+        });
+      } else {
+        pm.test('Invalid token returns 401 or 403', function () {
+          pm.expect([401, 403]).to.include(pm.response.code);
+        });
+      }
+    language: text/javascript
+order: 3000

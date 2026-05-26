@@ -1,0 +1,14 @@
+$kind: http-request
+name: GET /readings/latest - valid token is accepted
+url: "{{baseUrl}}/readings/latest?limit=1"
+method: GET
+headers:
+  Authorization: Bearer {{authToken}}
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Valid token request returns success', function () {
+        pm.expect(pm.response.code).to.eql(200);
+      });
+    language: text/javascript
+order: 1000

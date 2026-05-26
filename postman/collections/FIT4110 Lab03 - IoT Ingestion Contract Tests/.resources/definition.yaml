@@ -1,0 +1,9 @@
+$kind: collection
+description: "Postman Collection mẫu cho Buổi 3: Mock Server, provider-side tests, consumer-side smoke tests và Newman evidence. Cấu trúc folder bám theo bài giảng: Functional, Auth, Negative, Boundary/Reliability, Consumer-side và Local-only."
+scripts:
+  - type: http:beforeRequest
+    code: |-
+      const prefix = pm.environment.get('tracePrefix') || 'fit4110-lab03';
+      pm.variables.set('traceId', prefix + '-' + Date.now());
+      pm.request.headers.upsert({ key: 'X-Trace-Id', value: pm.variables.get('traceId') });
+    language: text/javascript
