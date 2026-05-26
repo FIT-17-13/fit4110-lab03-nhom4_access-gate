@@ -1,0 +1,192 @@
+﻿{
+  "info": {
+    "name": "FIT4110 Lab03 - Access Gate Contract Tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman/Newman tests for A3 Access Gate Lab 03. Covers Pair 3, Pair 10 and Pair 9 mock endpoint."
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      { "key": "token", "value": "{{authToken}}", "type": "string" }
+    ]
+  },
+  "event": [
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Response time is present', function () {",
+          "  pm.expect(pm.response.responseTime).to.be.a('number');",
+          "});"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "01_Functional",
+      "item": [
+        {
+          "name": "Health check returns ok",
+          "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/health" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Health body has ok status', function () { const json = pm.response.json(); pm.expect(json.status).to.eql('ok'); pm.expect(json).to.have.property('service'); });"
+          ] }}]
+        },
+        {
+          "name": "Pair 3 - recent access logs",
+          "request": { "method": "GET", "url": "{{baseUrl}}/access/logs/recent?limit=20" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Response has data array', function () { const json = pm.response.json(); pm.expect(json).to.have.property('data'); pm.expect(json.data).to.be.an('array'); });",
+            "pm.test('Access log fields are present', function () { const item = pm.response.json().data[0]; pm.expect(item).to.include.keys('logId','cardId','gateId','direction','timestamp','status'); });"
+          ] }}]
+        },
+        {
+          "name": "Pair 3 - get gate status",
+          "request": { "method": "GET", "url": "{{baseUrl}}/gates/{{gateId}}/status" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Gate status enum is valid', function () { const json = pm.response.json(); pm.expect(['ONLINE','OFFLINE','MAINTENANCE']).to.include(json.status); });"
+          ] }}]
+        },
+        {
+          "name": "Pair 10 - access check allows card",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/access/check",
+            "body": { "mode": "raw", "raw": "{\n  \"cardId\": \"{{cardId}}\",\n  \"gateId\": \"{{gateId}}\",\n  \"direction\": \"IN\",\n  \"timestamp\": \"2026-05-26T08:00:00Z\",\n  \"idempotencyKey\": \"{{cardId}}-{{gateId}}-20260526080000\",\n  \"operatorNote\": \"none\"\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status is 200', function () { pm.response.to.have.status(200); });",
+            "pm.test('Decision has allow and reasonCode', function () { const json = pm.response.json(); pm.expect(json).to.have.property('allow'); pm.expect(json).to.have.property('reasonCode'); pm.expect(['ACCESS_ALLOWED','CARD_BLOCKED','CARD_EXPIRED','OUTSIDE_TIME_WINDOW','ROLE_NOT_ALLOWED','POLICY_NOT_FOUND','SYSTEM_ERROR']).to.include(json.reasonCode); });"
+          ] }}]
+        },
+        {
+          "name": "Pair 9 - analytics accepts access event",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{analyticsMockUrl}}/events",
+            "body": { "mode": "raw", "raw": "{\n  \"eventId\": \"evt-20260526-0001\",\n  \"eventType\": \"access.logs.created\",\n  \"eventVersion\": \"1.0.0\",\n  \"occurredAt\": \"2026-05-26T08:00:00Z\",\n  \"source\": \"access-gate\",\n  \"correlationId\": \"corr-20260526-0001\",\n  \"data\": {\n    \"logId\": \"{{logId}}\",\n    \"cardId\": \"{{cardId}}\",\n    \"gateId\": \"{{gateId}}\",\n    \"direction\": \"IN\",\n    \"status\": \"ALLOWED\"\n  }\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Status is 202', function () { pm.response.to.have.status(202); });",
+            "pm.test('Event accepted response', function () { const json = pm.response.json(); pm.expect(json.accepted).to.eql(true); pm.expect(json.status).to.eql('accepted'); pm.expect(json).to.have.property('eventId'); });"
+          ] }}]
+        }
+      ]
+    },
+    {
+      "name": "02_Auth",
+      "item": [
+        {
+          "name": "Protected access logs without token returns 401 or 403",
+          "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/access/logs/recent" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Unauthorized or forbidden', function () { pm.expect([401,403]).to.include(pm.response.code); });"
+          ] }}]
+        }
+      ]
+    },
+    {
+      "name": "03_Negative",
+      "item": [
+        {
+          "name": "Access check missing cardId returns client error",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/access/check",
+            "body": { "mode": "raw", "raw": "{\n  \"gateId\": \"{{gateId}}\",\n  \"direction\": \"IN\",\n  \"timestamp\": \"2026-05-26T08:00:00Z\",\n  \"idempotencyKey\": \"missing-card\",\n  \"operatorNote\": \"none\"\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Client error', function () { pm.expect([400,422]).to.include(pm.response.code); });"
+          ] }}]
+        },
+        {
+          "name": "Analytics event invalid enum returns 422 or 400",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{analyticsMockUrl}}/events",
+            "body": { "mode": "raw", "raw": "{\n  \"eventId\": \"evt-invalid-001\",\n  \"eventType\": \"access.logs.created\",\n  \"eventVersion\": \"1.0.0\",\n  \"occurredAt\": \"2026-05-26T08:00:00Z\",\n  \"source\": \"access-gate\",\n  \"correlationId\": \"corr-invalid-001\",\n  \"data\": {\n    \"logId\": \"{{logId}}\",\n    \"cardId\": \"{{cardId}}\",\n    \"gateId\": \"{{gateId}}\",\n    \"direction\": \"ENTER\",\n    \"status\": \"SUCCESS\"\n  }\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Invalid enum returns client error', function () { pm.expect([400,422]).to.include(pm.response.code); });"
+          ] }}]
+        }
+      ]
+    },
+    {
+      "name": "04_Boundary_Reliability",
+      "item": [
+        {
+          "name": "Recent logs accepts maximum limit 100",
+          "request": { "method": "GET", "url": "{{baseUrl}}/access/logs/recent?limit=100" },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Boundary status is successful or documented client error', function () { pm.expect([200,400,422]).to.include(pm.response.code); });",
+            "pm.test('No server error on boundary', function () { pm.expect(pm.response.code).to.be.below(500); });"
+          ] }}]
+        },
+        {
+          "name": "Access check response time documented",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/access/check",
+            "body": { "mode": "raw", "raw": "{\n  \"cardId\": \"{{cardId}}\",\n  \"gateId\": \"{{gateId}}\",\n  \"direction\": \"IN\",\n  \"timestamp\": \"2026-05-26T08:00:00Z\",\n  \"idempotencyKey\": \"{{cardId}}-{{gateId}}-boundary\",\n  \"operatorNote\": \"none\"\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Mock responds without server error', function () { pm.expect(pm.response.code).to.be.below(500); });",
+            "pm.test('Mock latency is not used as real SLA proof', function () { pm.expect(pm.environment.get('env')).to.be.oneOf(['mock','local']); });"
+          ] }}]
+        }
+      ]
+    },
+    {
+      "name": "05_Consumer_side_Smoke",
+      "item": [
+        {
+          "name": "Smoke - Access Gate can call Core Business access check mock",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{coreBusinessMockUrl}}/access/check",
+            "body": { "mode": "raw", "raw": "{\n  \"cardId\": \"{{cardId}}\",\n  \"gateId\": \"{{gateId}}\",\n  \"direction\": \"IN\",\n  \"timestamp\": \"2026-05-26T08:00:00Z\",\n  \"idempotencyKey\": \"{{cardId}}-{{gateId}}-smoke\",\n  \"operatorNote\": \"none\"\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('Core Business mock is callable', function () { pm.response.to.have.status(200); });",
+            "pm.test('Decision body exists', function () { const json = pm.response.json(); pm.expect(json).to.have.property('allow'); });"
+          ] }}]
+        }
+      ]
+    },
+    {
+      "name": "06_Local_only_NonFunctional",
+      "item": [
+        {
+          "name": "Local-only access check latency placeholder",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/access/check",
+            "body": { "mode": "raw", "raw": "{\n  \"cardId\": \"{{cardId}}\",\n  \"gateId\": \"{{gateId}}\",\n  \"direction\": \"IN\",\n  \"timestamp\": \"2026-05-26T08:00:00Z\",\n  \"idempotencyKey\": \"{{cardId}}-{{gateId}}-local\",\n  \"operatorNote\": \"none\"\n}" }
+          },
+          "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "if (pm.environment.get('env') === 'local') {",
+            "  pm.test('Local service response time below 1000ms', function () { pm.expect(pm.response.responseTime).to.be.below(1000); });",
+            "} else {",
+            "  pm.test('Skipped in mock environment', function () { pm.expect(pm.environment.get('env')).to.eql('mock'); });",
+            "}"
+          ] }}]
+        }
+      ]
+    }
+  ]
+}

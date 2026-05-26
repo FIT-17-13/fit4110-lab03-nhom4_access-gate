@@ -1,6 +1,10 @@
-node_modules/
+﻿node_modules/
 .DS_Store
 .env
+prism.log
 reports/*.xml
 reports/*.html
-prism.log
+!reports/newman-report-mock.xml
+!reports/newman-report.html
+!reports/contract-lint-report.txt
+!reports/.gitkeep

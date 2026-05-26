@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="FIT4110 Lab03 - Access Gate Contract Tests" tests="12" time="0.220">
+  <testsuite name="01_Functional / Health check returns ok" id="0f9ffb4b-3fb6-4355-ab12-e39bb4f677bd" timestamp="2026-05-26T16:51:43.242Z" tests="3" failures="0" errors="0" time="0.076">
+    <testcase name="Response time is present" time="0.076" classname="01FunctionalHealthCheckReturnsOk"/>
+    <testcase name="Status is 200" time="0.076" classname="01FunctionalHealthCheckReturnsOk"/>
+    <testcase name="Health body has ok status" time="0.076" classname="01FunctionalHealthCheckReturnsOk"/>
+  </testsuite>
+  <testsuite name="01_Functional / Pair 3 - recent access logs" id="86d89b45-96f6-451e-a9db-6025d06c0117" timestamp="2026-05-26T16:51:43.242Z" tests="4" failures="0" errors="0" time="0.014">
+    <testcase name="Response time is present" time="0.014" classname="01FunctionalPair3RecentAccessLogs"/>
+    <testcase name="Status is 200" time="0.014" classname="01FunctionalPair3RecentAccessLogs"/>
+    <testcase name="Response has data array" time="0.014" classname="01FunctionalPair3RecentAccessLogs"/>
+    <testcase name="Access log fields are present" time="0.014" classname="01FunctionalPair3RecentAccessLogs"/>
+  </testsuite>
+  <testsuite name="01_Functional / Pair 3 - get gate status" id="b0f703a6-510e-4965-a0f5-6ca7d79427b5" timestamp="2026-05-26T16:51:43.242Z" tests="3" failures="0" errors="0" time="0.011">
+    <testcase name="Response time is present" time="0.011" classname="01FunctionalPair3GetGateStatus"/>
+    <testcase name="Status is 200" time="0.011" classname="01FunctionalPair3GetGateStatus"/>
+    <testcase name="Gate status enum is valid" time="0.011" classname="01FunctionalPair3GetGateStatus"/>
+  </testsuite>
+  <testsuite name="01_Functional / Pair 10 - access check allows card" id="d0dfa8da-f650-4ebd-9ace-4a456d6aecf8" timestamp="2026-05-26T16:51:43.242Z" tests="3" failures="0" errors="0" time="0.012">
+    <testcase name="Response time is present" time="0.012" classname="01FunctionalPair10AccessCheckAllowsCard"/>
+    <testcase name="Status is 200" time="0.012" classname="01FunctionalPair10AccessCheckAllowsCard"/>
+    <testcase name="Decision has allow and reasonCode" time="0.012" classname="01FunctionalPair10AccessCheckAllowsCard"/>
+  </testsuite>
+  <testsuite name="01_Functional / Pair 9 - analytics accepts access event" id="f81446f0-dcb5-42dc-80ab-78cb8fa7580e" timestamp="2026-05-26T16:51:43.242Z" tests="3" failures="0" errors="0" time="0.010">
+    <testcase name="Response time is present" time="0.010" classname="01FunctionalPair9AnalyticsAcceptsAccessEvent"/>
+    <testcase name="Status is 202" time="0.010" classname="01FunctionalPair9AnalyticsAcceptsAccessEvent"/>
+    <testcase name="Event accepted response" time="0.010" classname="01FunctionalPair9AnalyticsAcceptsAccessEvent"/>
+  </testsuite>
+  <testsuite name="02_Auth / Protected access logs without token returns 401 or 403" id="bb36b0b8-885c-4489-be27-c3c1950a61d9" timestamp="2026-05-26T16:51:43.242Z" tests="2" failures="0" errors="0" time="0.014">
+    <testcase name="Response time is present" time="0.014" classname="02AuthProtectedAccessLogsWithoutTokenReturns401Or403"/>
+    <testcase name="Unauthorized or forbidden" time="0.014" classname="02AuthProtectedAccessLogsWithoutTokenReturns401Or403"/>
+  </testsuite>
+  <testsuite name="03_Negative / Access check missing cardId returns client error" id="8d56968b-4082-4290-bb43-1e99a5c29305" timestamp="2026-05-26T16:51:43.242Z" tests="2" failures="0" errors="0" time="0.016">
+    <testcase name="Response time is present" time="0.016" classname="03NegativeAccessCheckMissingCardIdReturnsClientError"/>
+    <testcase name="Client error" time="0.016" classname="03NegativeAccessCheckMissingCardIdReturnsClientError"/>
+  </testsuite>
+  <testsuite name="03_Negative / Analytics event invalid enum returns 422 or 400" id="215b6083-aa8a-4cdf-87ce-9bb08e5fb43a" timestamp="2026-05-26T16:51:43.242Z" tests="2" failures="0" errors="0" time="0.020">
+    <testcase name="Response time is present" time="0.020" classname="03NegativeAnalyticsEventInvalidEnumReturns422Or400"/>
+    <testcase name="Invalid enum returns client error" time="0.020" classname="03NegativeAnalyticsEventInvalidEnumReturns422Or400"/>
+  </testsuite>
+  <testsuite name="04_Boundary_Reliability / Recent logs accepts maximum limit 100" id="6d33dfce-465f-4652-bd40-429eba499b22" timestamp="2026-05-26T16:51:43.242Z" tests="3" failures="0" errors="0" time="0.010">
+    <testcase name="Response time is present" time="0.010" classname="04BoundaryReliabilityRecentLogsAcceptsMaximumLimit100"/>
+    <testcase name="Boundary status is successful or documented client error" time="0.010" classname="04BoundaryReliabilityRecentLogsAcceptsMaximumLimit100"/>
+    <testcase name="No server error on boundary" time="0.010" classname="04BoundaryReliabilityRecentLogsAcceptsMaximumLimit100"/>
+  </testsuite>
+  <testsuite name="04_Boundary_Reliability / Access check response time documented" id="19403b30-490a-407b-a32d-b64d6eb14ba2" timestamp="2026-05-26T16:51:43.242Z" tests="3" failures="0" errors="0" time="0.017">
+    <testcase name="Response time is present" time="0.017" classname="04BoundaryReliabilityAccessCheckResponseTimeDocumented"/>
+    <testcase name="Mock responds without server error" time="0.017" classname="04BoundaryReliabilityAccessCheckResponseTimeDocumented"/>
+    <testcase name="Mock latency is not used as real SLA proof" time="0.017" classname="04BoundaryReliabilityAccessCheckResponseTimeDocumented"/>
+  </testsuite>
+  <testsuite name="05_Consumer_side_Smoke / Smoke - Access Gate can call Core Business access check mock" id="ab499eff-fcc7-4c2a-a29d-2c750374f248" timestamp="2026-05-26T16:51:43.242Z" tests="3" failures="0" errors="0" time="0.009">
+    <testcase name="Response time is present" time="0.009" classname="05ConsumerSideSmokeSmokeAccessGateCanCallCoreBusinessAccessCheckMock"/>
+    <testcase name="Core Business mock is callable" time="0.009" classname="05ConsumerSideSmokeSmokeAccessGateCanCallCoreBusinessAccessCheckMock"/>
+    <testcase name="Decision body exists" time="0.009" classname="05ConsumerSideSmokeSmokeAccessGateCanCallCoreBusinessAccessCheckMock"/>
+  </testsuite>
+  <testsuite name="06_Local_only_NonFunctional / Local-only access check latency placeholder" id="83574d80-2039-4d0e-96e2-c741d1ad6b6d" timestamp="2026-05-26T16:51:43.242Z" tests="2" failures="0" errors="0" time="0.011">
+    <testcase name="Response time is present" time="0.011" classname="06LocalOnlyNonFunctionalLocalOnlyAccessCheckLatencyPlaceholder"/>
+    <testcase name="Skipped in mock environment" time="0.011" classname="06LocalOnlyNonFunctionalLocalOnlyAccessCheckLatencyPlaceholder"/>
+  </testsuite>
+</testsuites>

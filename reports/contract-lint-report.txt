@@ -1,0 +1,3 @@
+﻿Contract lint result for contracts/access-gate.openapi.yaml
+Command: spectral lint contracts/access-gate.openapi.yaml --fail-severity error
+Result: No results with a severity of 'error' found.

@@ -1,6 +1,13 @@
-ID,Folder,Endpoint,Method,Scenario,Input file/body,Expected status,Expected response check,Type,Pass/Fail,Evidence
-TC01,Functional,/health,GET,Service is alive,-,200,status=ok,functional,,
-TC02,Functional,/readings,POST,Create reading happy path,mock-data/sensor-reading-valid.json,201,"has reading_id, accepted=true",functional,,
-TC03,Negative,/readings,POST,Missing device_id,mock-data/sensor-reading-invalid-missing-device.json,400,Problem Details,negative,,
-TC04,Auth,/readings,POST,Missing token,mock-data/sensor-reading-valid.json,401,Problem Details,auth,,
-TC05,Boundary,/readings,POST,High temperature boundary,mock-data/sensor-reading-boundary.json,201/400,documented behavior,boundary,,
+﻿ID,Folder,Endpoint,Method,Scenario,Input file/body,Expected status,Expected response check,Type,Pass/Fail,Evidence
+TC01,Functional,/health,GET,Service health check,-,200,status=ok,functional,Pass,reports/newman-report.html
+TC02,Functional,/access/logs/recent,GET,List recent access logs,limit=20,200,data is array and item has logId/cardId/gateId,functional,Pass,reports/newman-report.html
+TC03,Functional,/gates/{gateId}/status,GET,Get gate status,gateId=gate-main-01,200,status enum ONLINE/OFFLINE/MAINTENANCE,functional,Pass,reports/newman-report.html
+TC04,Functional,/access/check,POST,Access policy check happy path,AccessRequest JSON,200,has allow and reasonCode,functional,Pass,reports/newman-report.html
+TC05,Functional,/events,POST,Analytics accepts access log event,AccessLogCreatedEvent JSON,202,accepted=true and status=accepted,functional,Pass,reports/newman-report.html
+TC06,Auth,/access/logs/recent,GET,Missing bearer token,-,401/403,Unauthorized or forbidden,auth,Pass,reports/newman-report.html
+TC07,Negative,/access/check,POST,Missing cardId,AccessRequest without cardId,400/422,Client error,negative,Pass,reports/newman-report.html
+TC08,Negative,/events,POST,Invalid enum direction/status,Event with ENTER/SUCCESS,400/422,Client error,negative,Pass,reports/newman-report.html
+TC09,Boundary,/access/logs/recent,GET,Maximum limit boundary,limit=100,200/400/422,No 5xx,boundary,Pass,reports/newman-report.html
+TC10,Reliability,/access/check,POST,Mock response does not prove real SLA,AccessRequest JSON,200,No server error and note mock env,reliability,Pass,reports/newman-report.html
+TC11,Consumer-side Smoke,/access/check,POST,Access Gate calls Core Business mock,AccessRequest JSON,200,Decision body exists,smoke,Pass,reports/newman-report.html
+TC12,Local-only,/access/check,POST,Local latency placeholder,AccessRequest JSON,200 on mock or latency check local,Skipped in mock environment,local-only,Pass,reports/newman-report.html
