@@ -29,7 +29,7 @@ jobs:
         run: nohup npm run mock:gate > prism-gate.log 2>&1 &
 
       - name: Wait for Access Gate mock server
-        run: npx wait-on http://127.0.0.1:4010/health --timeout 30000
+        run: npx wait-on http-get://127.0.0.1:4010/health --timeout 30000
 
       - name: Run Newman contract tests
         run: npm run test:mock
